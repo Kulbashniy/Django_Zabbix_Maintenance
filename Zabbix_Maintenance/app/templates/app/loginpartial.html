@@ -1,0 +1,28 @@
+{% if user.is_authenticated %}
+    <form id="logoutForm" action="/logout/" method="post" class="form-inline">
+        {% csrf_token %}
+        <span class="navbar-brand">Привет {{ user.username }}!</span>    
+    </form>
+    {% if request.user.is_staff or request.user.is_superuser %}
+        <ul class="navbar-nav mr-right mt-2 mt-lg-0">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'admin:index' %}">Админ панель 
+                    <span class="sr-only">(current)</span>
+                </a>
+            </li>
+        </ul>
+    {% endif %}
+    <ul class="navbar-nav mr-right mt-2 mt-lg-0">
+        <li class="nav-item">
+            <a class="nav-link" href="javascript:document.getElementById('logoutForm').submit()">Выйти</a>
+                <span class="sr-only">(current)</span>
+            </a>
+        </li>
+    </ul>
+
+{% else %}
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'login' %}">Войти</a>
+    </li>
+
+{% endif %}

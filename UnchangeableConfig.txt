@@ -1,0 +1,6 @@
+superuser
+login: admin
+password: custom_password
+
+Доступ к площадкам
+key: custom_key

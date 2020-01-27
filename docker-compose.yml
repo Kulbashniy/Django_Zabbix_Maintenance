@@ -1,0 +1,13 @@
+version: '3.7'
+services:
+  django:
+    build: .
+    image: django_zabbix:zabbix_mm
+    volumes:
+      - .:/code
+    restart: on-failure
+    extra_hosts:
+      - "skuf-portal.gosuslugi.ru:109.207.2.61"
+    ports:
+      - "8003:8003"
+    command: python3 Zabbix_Maintenance/manage.py runserver 0.0.0.0:8003

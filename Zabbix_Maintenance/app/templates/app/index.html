@@ -1,0 +1,135 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+
+<div class="wrapper">
+    <div class="container-fluid" style="padding-bottom: 10px">
+        <div class="row justify-content-end">
+            <div class="col-auto">
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalCreateMM">
+                    Создать режим обслуживания
+                </button>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Modal -->
+    <div class="modal fade" id="ModalCreateMM" tabindex="-1" role="dialog" aria-labelledby="ModalCreateMMTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ModalCreateMMTitle">Режим обслуживания</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="form-group row">
+                            <label for="input_crq" class="col-sm-2 col-form-label">CRQ</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="input_crq" placeholder="CRQ1234567890" aria-describedby="btn_check_crq" required>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="button" id="btn_check_crq">Проверить
+                                        </button>
+                                    </div>
+                                    <div class="invalid-feedback" id="invalid_crq">
+                                        Введите номер CRQ
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="input_start" class="col-sm-2 col-form-label">Начало</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control col-sm-12" id="input_start" readonly style="margin-right: 5px">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="input_end" class="col-sm-2 col-form-label">Конец</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control col-sm-12" id="input_end" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            {% if hg_with_h == None %}
+                                <div class="col align-self-center">
+                                    <h6 style="color: rgba(205, 0, 0, 0.6)">Данные по хостам с заббикса не были получены!</h6>
+                                </div>
+                            {% else %}
+                                <div class="col-sm-2">
+                                    <label class="col-form-label">Хосты</label>
+                                </div>
+                                <div class="col-sm-10">
+                                    <select class="selectpicker form-control show-tick" multiple data-live-search="true" data-width="100%" title="Выберите хосты">
+                                        {% for host_group in hg_with_h %}
+                                            <optgroup label="{{ host_group.name }}" value="{{ host_group.id }}" data-subtext="{{ host_group.zabbix }}">
+                                                {% for host in host_group.hosts %}
+                                                    <option value="{{ host.id }}" data-subtext="{{ host.zabbix }}" data-tokens="{{ host_group.name }}">{{ host.name }}</option>
+                                                {% endfor %}
+                                            </optgroup>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group row">
+                            {% if stands == None %}
+                                <div class="col align-self-center">
+                                    <h6 style="color: rgba(205, 0, 0, 0.6)">Данные по площадкам не были получены!</h6>
+                                </div>
+                            {% else %}
+                                <div class="col-sm-2">
+                                    <label class="col-form-label">Площадки</label>
+                                </div>
+                                <div class="col-sm-10">
+                                    <select id="select_stands" class="selectpicker form-control show-tick" multiple data-live-search="true" data-width="100%" title="Выберите площадки">
+                                        {% for stand in stands %}                                                
+                                            <option value="{{ stand.id }}">{{ stand.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                    <button type="button" id="btn_mm_create" class="btn btn-primary">Создать</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <!-- Maintenance Table -->
+        <table id="table_mm" class="table">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Статус</th>
+                    <th scope="col">Хосты</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mm in mms %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>{{ mm.status }}</td>
+                        <td>{{ mm.get_hosts }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% block scripts%}
+    {% load staticfiles %}
+    <script src="{% static 'app/scripts/index.js' %}"></script>
+{% endblock %}
+
+{% endblock %}
